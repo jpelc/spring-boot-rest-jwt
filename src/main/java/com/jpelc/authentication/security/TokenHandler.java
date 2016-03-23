@@ -2,17 +2,19 @@ package com.jpelc.authentication.security;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.stereotype.Component;
 
+@Component
 class TokenHandler {
 
-    private final String secret;
-    private final UserService userService;
+    @Value("secret-value")
+    private String secret;
 
-    TokenHandler(String secret, UserService userService) {
-        this.secret = secret;
-        this.userService = userService;
-    }
+    @Autowired
+    private UserService userService;
 
     User parseUserFromToken(String token) {
         String username = Jwts.parser()

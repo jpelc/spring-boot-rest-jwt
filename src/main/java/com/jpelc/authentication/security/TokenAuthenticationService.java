@@ -1,5 +1,6 @@
 package com.jpelc.authentication.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
@@ -12,11 +13,8 @@ class TokenAuthenticationService {
 
     private static final String AUTH_HEADER_NAME = "X-AUTH-TOKEN";
 
-    private final TokenHandler tokenHandler;
-
-    TokenAuthenticationService(String secret, UserService userService) {
-        tokenHandler = new TokenHandler(secret, userService);
-    }
+    @Autowired
+    private TokenHandler tokenHandler;
 
     void addAuthentication(HttpServletResponse response, UserAuthentication authentication) {
         final User user = (User) authentication.getDetails();
