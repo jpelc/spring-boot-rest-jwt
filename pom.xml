@@ -4,12 +4,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.jpelc.authentication</groupId>
-	<artifactId>springboot-angularjs-jwt-auth</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<artifactId>spring-boot-rest-jwt</artifactId>
+	<version>1.0</version>
 	<packaging>jar</packaging>
 
-	<name>springboot-angularjs-jwt-auth</name>
-	<description>Spring Boot project with JWT-based authentication mechanism, tested by simple AngularJS app.</description>
+	<name>spring-boot-rest-jwt</name>
+	<description>Spring Boot project with JWT-based authentication mechanism.</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -71,6 +71,5 @@
 			</plugin>
 		</plugins>
 	</build>
-	
 
 </project>
