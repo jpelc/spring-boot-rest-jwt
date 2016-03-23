@@ -2,6 +2,7 @@ package com.jpelc.authentication.security;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -18,42 +19,38 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.Optional;
 
 class LoginFilter extends AbstractAuthenticationProcessingFilter {
 
     private static final String PASSWORD_KEY = "password";
     private static final String USERNAME_KEY = "username";
 
+    @Autowired
     private TokenAuthenticationService tokenAuthenticationService;
+
+    @Autowired
     private UserDetailsService userDetailsService;
 
-    LoginFilter(String defaultFilterProcessesUrl, UserDetailsService userDetailsService, TokenAuthenticationService tokenAuthenticationService) {
+    LoginFilter(String defaultFilterProcessesUrl) {
         super(new AntPathRequestMatcher(defaultFilterProcessesUrl, "POST"));
-        this.userDetailsService = userDetailsService;
-        this.tokenAuthenticationService = tokenAuthenticationService;
     }
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
+        logger.info("LoginFilter");
+
         if (!request.getMethod().equals("POST")) {
             throw new AuthenticationServiceException("Authentication method not supported: " + request.getMethod());
         } else {
             JsonNode jsonObject = toJSONObject(request);
 
-            String username = this.obtainUsername(jsonObject);
-            String password = this.obtainPassword(jsonObject);
+            String username = Optional.ofNullable(this.obtainUsername(jsonObject)).orElse("").trim();
+            String password = Optional.ofNullable(this.obtainPassword(jsonObject)).orElse("");
 
-            if (username == null) {
-                username = "";
-            }
-
-            if (password == null) {
-                password = "";
-            }
-
-            username = username.trim();
             UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(username, password);
             this.setDetails(request, authRequest);
+
             return this.getAuthenticationManager().authenticate(authRequest);
         }
     }

@@ -1,10 +1,12 @@
 package com.jpelc.authentication.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.embedded.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -15,10 +17,15 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    private TokenAuthenticationService tokenAuthenticationService;
+    private UserService userService;
 
     @Autowired
-    private UserService userService;
+    private AuthenticationFilter authenticationFilter;
+
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        super.configure(web);
+    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -47,12 +54,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 // All other request need to be authenticated
                 .anyRequest().authenticated()
                 .and()
-
                 // custom JSON based authentication by POST of {"username":"<name>","password":"<password>"}
                 .addFilterBefore(loginFilter(), UsernamePasswordAuthenticationFilter.class)
 
                 // Custom Token based authentication based on the header previously given to the client
-                .addFilterBefore(authenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
     @Override
@@ -62,7 +68,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Bean
     public LoginFilter loginFilter() {
-        LoginFilter loginFilter = new LoginFilter("/auth/login", userService, tokenAuthenticationService);
+        LoginFilter loginFilter = new LoginFilter("/auth/login");
         try {
             loginFilter.setAuthenticationManager(authenticationManager());
         } catch (Exception e) {
@@ -72,7 +78,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public AuthenticationFilter authenticationFilter() {
-        return new AuthenticationFilter(tokenAuthenticationService);
+    public FilterRegistrationBean filterRegistrationBean() {
+        FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
+        filterRegistrationBean.setEnabled(false);
+        filterRegistrationBean.setFilter(authenticationFilter);
+        return filterRegistrationBean;
     }
 }
