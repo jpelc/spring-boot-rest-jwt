@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 class TokenHandler {
 
-    @Value("secret-value")
+    @Value("secret")
     private String secret;
 
     @Autowired

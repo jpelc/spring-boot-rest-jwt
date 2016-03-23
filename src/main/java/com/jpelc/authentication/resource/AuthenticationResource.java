@@ -13,11 +13,11 @@ public class AuthenticationResource {
 
     @RequestMapping(value = "test", method = RequestMethod.GET)
     public String test() {
-        return "SDSDSDSDSDSDSDSDS";
+        return "Unauthorized resource";
     }
 
     @RequestMapping(value = "login", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity add(@RequestBody String credentials) {
+    public ResponseEntity add() {
         return ResponseEntity.ok("OK");
     }
 
