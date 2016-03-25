@@ -1,12 +1,15 @@
 package com.jpelc.authentication.security;
 
+import io.jsonwebtoken.JwtException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Optional;
 
 @Service
 class TokenAuthenticationService {
@@ -22,14 +25,20 @@ class TokenAuthenticationService {
     }
 
     Authentication getAuthentication(HttpServletRequest request) {
-        final String token = request.getHeader(AUTH_HEADER_NAME);
-        if (token != null) {
-            final User user = tokenHandler.parseUserFromToken(token);
-            if (user != null) {
-                return new UserAuthentication(user, true);
-            }
+        final Optional<String> token = Optional.ofNullable(request.getHeader(AUTH_HEADER_NAME));
+
+        String tokenValue = token.orElseThrow(() -> new AuthenticationCredentialsNotFoundException("Token not found."));
+
+        final Optional<User> user;
+        try {
+            user = Optional.ofNullable(tokenHandler.parseUserFromToken(tokenValue));
+        } catch (JwtException e) {
+            throw new AuthenticationCredentialsNotFoundException("Invalid.");
         }
-        return null;
+
+        final User userValue = user.orElseThrow(() -> new AuthenticationCredentialsNotFoundException("User does not exist."));
+
+        return new UserAuthentication(userValue, true);
     }
 
 }

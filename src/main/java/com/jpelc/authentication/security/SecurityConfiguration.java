@@ -54,6 +54,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 // All other request need to be authenticated
                 .anyRequest().authenticated()
                 .and()
+
                 // custom JSON based authentication by POST of {"username":"<name>","password":"<password>"}
                 .addFilterBefore(loginFilter(), UsernamePasswordAuthenticationFilter.class)
 

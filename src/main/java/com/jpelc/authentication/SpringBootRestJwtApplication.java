@@ -4,9 +4,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SpringBootAngularJSJwtAuthApplication {
+public class SpringBootRestJwtApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SpringBootAngularJSJwtAuthApplication.class, args);
+		SpringApplication.run(SpringBootRestJwtApplication.class, args);
 	}
 }

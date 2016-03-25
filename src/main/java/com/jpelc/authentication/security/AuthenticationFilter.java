@@ -2,6 +2,7 @@ package com.jpelc.authentication.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
@@ -21,13 +22,20 @@ class AuthenticationFilter extends GenericFilterBean {
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        logger.info("authentication filter");
-
+        logger.info("AuthenticationFilter");
         HttpServletRequest httpRequest = (HttpServletRequest) servletRequest;
-        Authentication authentication = tokenAuthenticationService.getAuthentication(httpRequest);
-        logger.info(authentication);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        Authentication authentication = null;
+        try {
+            logger.info("Before authentication");
+            authentication = tokenAuthenticationService.getAuthentication(httpRequest);
+            logger.info("After authentication");
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        } catch (AuthenticationException authenticationException) {
+            logger.info("Authentication exception");
+            SecurityContextHolder.clearContext();
+        }
+
         filterChain.doFilter(servletRequest, servletResponse);
     }
-
 }
